@@ -20,15 +20,15 @@ addEventListener("keyup", function (e) {
 
 var speed = 20 //amount of times per second main loop is run
 
-var cliptoggle = false
-var flytoggle = false
-var teleporttoggle = false
-var freecamtoggle = false
-var gravitytoggle = false
+var clipToggle = false
+var flyToggle = false
+var teleportToggle = false
+var freecamToggle = false
+var gravityToggle = false
 
-var newgravity = 2400
+var newGravity = 2400
 
-var prevpos = player.pos
+var prevPos = player.pos
 
 var code = {
 	g:71, //g key
@@ -43,37 +43,37 @@ var code = {
 }
 
 //For some reason if you just put it in body it turns the whole screen white or black
-//document.getElementById("canvas").innerHTML += `<div id="manylandmodlist" style="position:fixed;left:5px;top:5px;z-index:99999;opacity:1;"></div>`
+//document.getElementById("canvas").innerHTML += `<div id="manylandmodList" style="position:fixed;left:5px;top:5px;z-index:99999;opacity:1;"></div>`
 
 //Main loop
 setInterval(function(){
 	if(toggleCode.length > 0)
 		switch(toggleCode.shift()){ //Determines what mods should be disabled or enabled
 			case code.g:
-				cliptoggle = !cliptoggle
+				clipToggle = !clipToggle
 			break;
 			case code.h:
-				flytoggle = !flytoggle
+				flyToggle = !flyToggle
 			break;
 			case code.j:
-				teleporttoggle = !teleporttoggle
+				teleportToggle = !teleportToggle
 			break;
 			case code.k:
-				freecamtoggle = !freecamtoggle
-				prevpos = player.pos
+				freecamToggle = !freecamToggle
+				prevPos = player.pos //Records location to lock player to
 				ig.game.camera.offset.x = -304.75 //Resets camera position
 				ig.game.camera.offset.y = -173
 			break;
 			case code.l:
-				gravitytoggle = !gravitytoggle
+				gravityToggle = !gravityToggle
 			break;
 		}
 		
 	//Perform acts of wizardry
-	var modlist = "" //Gui list of mods
+	var modList = "" //Gui list of mods, not implemented yet
 	
-	if(cliptoggle){
-		modlist += "clip \n"
+	if(clipToggle){
+		modList += "clip \n"
 		
 		player.vel = {x:0,y:0}
 		if(code.up in keysDown)
@@ -86,14 +86,14 @@ setInterval(function(){
 			player.pos.x += 16
 	}
 	
-	if(flytoggle){
+	if(flyToggle){
 		player.vel.y = -1
-		modlist += "fly \n"
+		modList += "fly \n"
 		if(code.up in keysDown)
 			player.pos.y -= 3
 		
 		if(code.down in keysDown){
-			player.vel.y = -0.001 //Has to work this way to prevent fall death
+			player.vel.y = -0.001 //Has to have a velocity moving upward otherwise it will kill you for falling
 			player.pos.y += 3
 		}
 		if(code.left in keysDown)
@@ -103,38 +103,38 @@ setInterval(function(){
 		
 	}
 	
-	if(teleporttoggle){
-		modlist += "teleport \n"
+	if(teleportToggle){
+		modList += "teleport \n"
 		
 		if(code.up in keysDown){
 			player.vel = {x:0,y:0}
 			player.pos.y -= 100
-			teleporttoggle = false
+			teleportToggle = false
 		}
 		if(code.down in keysDown){
 			player.vel = {x:0,y:0}
 			player.pos.y += 100
-			teleporttoggle = false
+			teleportToggle = false
 		}
 		if(code.left in keysDown){
 			player.vel = {x:0,y:0}
 			player.pos.x -= 100
-			teleporttoggle = false
+			teleportToggle = false
 		}
 		if(code.right in keysDown){
 			player.vel = {x:0,y:0}
 			player.pos.x += 100
-			teleporttoggle = false
+			teleportToggle = false
 		}
 		
 		
 	}
 	
-	if(freecamtoggle){ //Moves camera around
-		modlist += "freecam \n"
+	if(freecamToggle){ //Moves camera around while keeping player in one position
+		modList += "freecam \n"
 	
 		player.vel = {x:0,y:0}
-		player.pos = prevpos
+		player.pos = prevPos
 		
 		if(code.up in keysDown)
 			ig.game.camera.offset.y -= 10
@@ -145,15 +145,15 @@ setInterval(function(){
 		if(code.right in keysDown)
 			ig.game.camera.offset.x += 10
 		
-		prevpos = player.pos
+		prevPos = player.pos
 	}
 		
-	if(gravitytoggle){ 
-		modlist += "gravity \n"
-		ig.game.gravity = newgravity
-	} else gravitytoggle = 800 //default gravity
+	if(gravityToggle){ 
+		modList += "gravity \n"
+		ig.game.gravity = newGravity
+	} else gravityToggle = 800 //default gravity
 	
 	
-	//document.getElementById("manylandmodlist").innerHTML = modlist
+	//document.getElementById("manylandmodList").innerHTML = modList
 	
 },1000/speed)
