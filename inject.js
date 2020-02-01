@@ -7,8 +7,8 @@ function isPlayer(entity){
 var player = ig.game.entities.filter(isPlayer)[0]
 
 //Sets up program to detect keypresses because manyland's system is weird...
-var keysDown = {}
-var toggleCode = []
+var keysDown = {} //Detects which keys are held (continuous event)
+var toggleCode = [] //Detects which keys were pushed (one time event)
 
 addEventListener("keydown", function (e) {
   keysDown[e.keyCode] = true;
@@ -22,84 +22,138 @@ var speed = 20 //amount of times per second main loop is run
 
 var cliptoggle = false
 var flytoggle = false
-var speedtoggle = false
+var teleporttoggle = false
 var freecamtoggle = false
 var gravitytoggle = false
 
-var newgravity = 200
+var newgravity = 2400
+
+var prevpos = player.pos
+
+var code = {
+	g:71, //g key
+	h:72, //h key
+	j:74, //j key
+	k:75, //k key
+	l:76, //l key
+	up:38,  //up arrow key
+	down:40, //down arrow key
+	left:37, //left arrow key
+	right:39 //right  arrow key
+}
+
+//For some reason if you just put it in body it turns the whole screen white or black
+//document.getElementById("canvas").innerHTML += `<div id="manylandmodlist" style="position:fixed;left:5px;top:5px;z-index:99999;opacity:1;"></div>`
 
 //Main loop
 setInterval(function(){
 	if(toggleCode.length > 0)
-		switch(toggleCode.shift()){
-			case 71://g
+		switch(toggleCode.shift()){ //Determines what mods should be disabled or enabled
+			case code.g:
 				cliptoggle = !cliptoggle
 			break;
-			case 72://h
+			case code.h:
 				flytoggle = !flytoggle
 			break;
-			case 74://j
-				speedtoggle = !speedtoggle
+			case code.j:
+				teleporttoggle = !teleporttoggle
 			break;
-			case 75://k
+			case code.k:
 				freecamtoggle = !freecamtoggle
+				prevpos = player.pos
+				ig.game.camera.offset.x = -304.75 //Resets camera position
+				ig.game.camera.offset.y = -173
 			break;
-			case 76: //l
+			case code.l:
 				gravitytoggle = !gravitytoggle
 			break;
 		}
 		
 	//Perform acts of wizardry
+	var modlist = "" //Gui list of mods
+	
 	if(cliptoggle){
-		if(38 in keysDown)//up
+		modlist += "clip \n"
+		
+		player.vel = {x:0,y:0}
+		if(code.up in keysDown)
 			player.pos.y -= 16 //Manyland uses a coordinate system originating from the topleft so this is up
-		if(40 in keysDown)//down
+		if(code.down in keysDown)
 			player.pos.y += 16
-		if(37 in keysDown)//left
+		if(code.left in keysDown)
 			player.pos.x -= 16
-		if(39 in keysDown)//right
+		if(code.right in keysDown)
 			player.pos.x += 16
 	}
 	
 	if(flytoggle){
-		if(38 in keysDown)//up
-			player.vel.y -= 1 
-		if(40 in keysDown){//down
-			player.vel.y = 0.001 //Has to work this way to prevent fall death
-			player.pos.y += 1
+		player.vel.y = -1
+		modlist += "fly \n"
+		if(code.up in keysDown)
+			player.pos.y -= 3
+		
+		if(code.down in keysDown){
+			player.vel.y = -0.001 //Has to work this way to prevent fall death
+			player.pos.y += 3
 		}
-		if(37 in keysDown)//left
-			player.vel.x -= 1
-		if(39 in keysDown)//right
-			player.vel.x += 1
+		if(code.left in keysDown)
+			player.vel.x -= 2
+		if(code.right in keysDown)
+			player.vel.x += 2
 		
 	}
 	
-	if(freecamtoggle){
-		if(38 in keysDown)//up
-			ig.game.camera.offset.y -= 5
-		if(40 in keysDown)//down
-			ig.game.camera.offset.y += 5
-		if(37 in keysDown)//left
-			ig.game.camera.offset.x -= 5
-		if(39 in keysDown)//right
-			ig.game.camera.offset.x += 5
+	if(teleporttoggle){
+		modlist += "teleport \n"
+		
+		if(code.up in keysDown){
+			player.vel = {x:0,y:0}
+			player.pos.y -= 100
+			teleporttoggle = false
+		}
+		if(code.down in keysDown){
+			player.vel = {x:0,y:0}
+			player.pos.y += 100
+			teleporttoggle = false
+		}
+		if(code.left in keysDown){
+			player.vel = {x:0,y:0}
+			player.pos.x -= 100
+			teleporttoggle = false
+		}
+		if(code.right in keysDown){
+			player.vel = {x:0,y:0}
+			player.pos.x += 100
+			teleporttoggle = false
+		}
+		
+		
 	}
 	
-	if(speedtoggle){
-		if(38 in keysDown)//up
-			player.vel.y -= 0.5
-		if(40 in keysDown)//down
-			player.vel.y += 0.5
-		if(37 in keysDown)//left
-			player.vel.x -= 0.5
-		if(39 in keysDown)//right
-			player.vel.x += 0.5
+	if(freecamtoggle){ //Moves camera around
+		modlist += "freecam \n"
+	
+		player.vel = {x:0,y:0}
+		player.pos = prevpos
+		
+		if(code.up in keysDown)
+			ig.game.camera.offset.y -= 10
+		if(code.down in keysDown)
+			ig.game.camera.offset.y += 10
+		if(code.left in keysDown)
+			ig.game.camera.offset.x -= 10
+		if(code.right in keysDown)
+			ig.game.camera.offset.x += 10
+		
+		prevpos = player.pos
 	}
+		
+	if(gravitytoggle){ 
+		modlist += "gravity \n"
+		ig.game.gravity = newgravity
+	} else gravitytoggle = 800 //default gravity
 	
-	if(gravitytoggle) ig.game.gravity = newgravity
-	else gravitytoggle = 800 //default gravity
 	
-	
+	//document.getElementById("manylandmodlist").innerHTML = modlist
 	
 },1000/speed)
