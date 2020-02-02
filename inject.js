@@ -43,7 +43,14 @@ var code = {
 }
 
 //For some reason if you just put it in body it turns the whole screen white or black
-//document.getElementById("canvas").innerHTML += `<div id="manylandmodList" style="position:fixed;left:5px;top:5px;z-index:99999;opacity:1;"></div>`
+var gui = document.createElement("div");
+gui.id = "manylandmodlist"
+gui.style.position = "fixed"
+gui.style.left = 10
+gui.style.top = 10
+gui.zIndex = 99999
+document.body.appendChild(gui);
+
 
 //Main loop
 setInterval(function(){
@@ -72,6 +79,11 @@ setInterval(function(){
 	//Perform acts of wizardry
 	var modList = "" //Gui list of mods, not implemented yet
 	
+	if(gravityToggle){ 
+		modList += "gravity \n"
+		ig.game.gravity = newGravity
+	} else newGravity = 800 //default gravity
+	
 	if(clipToggle){
 		modList += "clip \n"
 		
@@ -87,14 +99,15 @@ setInterval(function(){
 	}
 	
 	if(flyToggle){
+		ig.gravity = 0
 		player.vel.y = -1
+		
 		modList += "fly \n"
 		if(code.up in keysDown)
-			player.pos.y -= 3
-		
+			player.pos.y -= 5
 		if(code.down in keysDown){
 			player.vel.y = -0.001 //Has to have a velocity moving upward otherwise it will kill you for falling
-			player.pos.y += 3
+			player.pos.y += 5
 		}
 		if(code.left in keysDown)
 			player.vel.x -= 2
@@ -147,13 +160,9 @@ setInterval(function(){
 		
 		prevPos = player.pos
 	}
-		
-	if(gravityToggle){ 
 		modList += "gravity \n"
-		ig.game.gravity = newGravity
-	} else gravityToggle = 800 //default gravity
 	
 	
-	//document.getElementById("manylandmodList").innerHTML = modList
+	document.getElementById("manylandmodlist").innerHTML = modList
 	
 },1000/speed)
