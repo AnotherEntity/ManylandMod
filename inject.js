@@ -1,10 +1,19 @@
 //Finds manyland player object in entity list
+
+var init = false
+
+window.onclick = function() {
+
+if(init == true) return
+init = true
+
 function isPlayer(entity){
     if(entity.screenName != undefined)return true
     else return false
 }
 
 var player = ig.game.entities.filter(isPlayer)[0]
+
 
 //Sets up program to detect keypresses because manyland's system is weird...
 var keysDown = {} //Detects which keys are held (continuous event)
@@ -70,14 +79,14 @@ setInterval(function(){
 				prevPos = player.pos //Records location to lock player to
 				ig.game.camera.offset.x = -304.75 //Resets camera position
 				ig.game.camera.offset.y = -173
-			break;
+			break; //gravity seems to be bugged and always on atm
 			case code.l:
 				gravityToggle = !gravityToggle
 			break;
 		}
 		
 	//Perform acts of wizardry
-	var modList = "" //Gui list of mods, not implemented yet
+	var modList = "ManyHack:" //Gui list of mods, not implemented yet
 	
 	if(gravityToggle){ 
 		modList += "gravity \n"
@@ -166,3 +175,4 @@ setInterval(function(){
 	document.getElementById("manylandmodlist").innerHTML = modList
 	
 },1000/speed)
+}
