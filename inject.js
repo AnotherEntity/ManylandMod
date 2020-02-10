@@ -79,7 +79,7 @@ setInterval(function(){
 				prevPos = player.pos //Records location to lock player to
 				ig.game.camera.offset.x = -304.75 //Resets camera position
 				ig.game.camera.offset.y = -173
-			break; //gravity seems to be bugged and always on atm
+			break; //gravity seems to be bugged and always ongi	atm
 			case code.l:
 				gravityToggle = !gravityToggle
 			break;
@@ -169,8 +169,6 @@ setInterval(function(){
 		
 		prevPos = player.pos
 	}
-		modList += "gravity \n"
-	
 	
 	document.getElementById("manylandmodlist").innerHTML = modList
 	
