@@ -69,8 +69,8 @@ setInterval(function(){
 		switch(toggleCode.shift()){ //Determines what mods should be disabled or enabled
 			case code.f:
 				if(clipToggle){
-					player.pos.x += ig.game.camera.offset.x -304.75 //Sets player location to where camera is looking
-					player.pos.y += ig.game.camera.offset.y -173
+					player.pos.x += ig.game.camera.offset.x +304.75 //Sets player location to where camera is looking
+					player.pos.y += ig.game.camera.offset.y +173
 					ig.game.camera.offset.x = -304.75 //Resets camera offset
 					ig.game.camera.offset.y = -173
 					
