@@ -30,6 +30,7 @@ addEventListener("keyup", function (e) {
 var speed = 20 //amount of times per second main loop is run
 
 var clipToggle = false
+var speedToggle = false
 var flyToggle = false
 var teleportToggle = false
 var freecamToggle = false
@@ -40,6 +41,7 @@ var newGravity = 2400
 var prevPos = player.pos
 
 var code = {
+	f:70, //f key
 	g:71, //g key
 	h:72, //h key
 	j:74, //j key
@@ -65,46 +67,74 @@ document.body.appendChild(gui);
 setInterval(function(){
 	if(toggleCode.length > 0)
 		switch(toggleCode.shift()){ //Determines what mods should be disabled or enabled
-			case code.g:
+			case code.f:
+				if(clipToggle){
+					player.pos.x += ig.game.camera.offset.x -304.75 //Sets player location to where camera is looking
+					player.pos.y += ig.game.camera.offset.y -173
+					ig.game.camera.offset.x = -304.75 //Resets camera offset
+					ig.game.camera.offset.y = -173
+					
+				}else{
+					prevPos = player.pos //Tells where to lock player to
+				}
 				clipToggle = !clipToggle
-			break;
+				break
+			case code.g:
+				speedToggle = !speedToggle
+			break
 			case code.h:
 				flyToggle = !flyToggle
-			break;
+			break
 			case code.j:
 				teleportToggle = !teleportToggle
-			break;
+			break
 			case code.k:
 				freecamToggle = !freecamToggle
 				prevPos = player.pos //Records location to lock player to
 				ig.game.camera.offset.x = -304.75 //Resets camera position
 				ig.game.camera.offset.y = -173
-			break; //gravity seems to be bugged and always ongi	atm
+			break //gravity seems to be bugged and always ongi	atm
 			case code.l:
 				gravityToggle = !gravityToggle
-			break;
+			break
 		}
 		
 	//Perform acts of wizardry
 	var modList = "ManyHack:" //Gui list of mods, not implemented yet
+	
+	if(clipToggle){
+		modList += "clip \n"
+		player.vel = {x:0,y:0}
+		player.pos = prevPos
+		
+		if(code.up in keysDown)
+			ig.game.camera.offset.y -= 10
+		if(code.down in keysDown)
+			ig.game.camera.offset.y += 10
+		if(code.left in keysDown)
+			ig.game.camera.offset.x -= 10
+		if(code.right in keysDown)
+			ig.game.camera.offset.x += 10
+	}
+	
 	
 	if(gravityToggle){ 
 		modList += "gravity \n"
 		ig.game.gravity = newGravity
 	} else newGravity = 800 //default gravity
 	
-	if(clipToggle){
-		modList += "clip \n"
+	if(speedToggle){
+		modList += "speed \n"
 		
 		player.vel = {x:0,y:0}
 		if(code.up in keysDown)
-			player.pos.y -= 16 //Manyland uses a coordinate system originating from the topleft so this is up
+			player.pos.y -= 5 //Manyland uses a coordinate system originating from the topleft so this is up
 		if(code.down in keysDown)
-			player.pos.y += 16
+			player.pos.y += 5
 		if(code.left in keysDown)
-			player.pos.x -= 16
+			player.pos.x -= 5
 		if(code.right in keysDown)
-			player.pos.x += 16
+			player.pos.x += 5
 	}
 	
 	if(flyToggle){
@@ -166,8 +196,6 @@ setInterval(function(){
 			ig.game.camera.offset.x -= 10
 		if(code.right in keysDown)
 			ig.game.camera.offset.x += 10
-		
-		prevPos = player.pos
 	}
 	
 	document.getElementById("manylandmodlist").innerHTML = modList
